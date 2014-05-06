@@ -215,14 +215,7 @@ EOF
 
 function set_samba_server {
 	INT_IP=$(get_nic_ip $INT_NIC)
-	tee -a $HOME/maas/etc/maas/pserv.yaml <<EOF
-
-windows:
-  ## Windows installation support requires that a SAMBA share be setup. The
-  ## share holds the installation files that Windows needs to perform the
-  ## installation.
-  remote_path: \\\\$INT_IP\\winpe
-EOF
+	sed -i 's/^# remote_path: \\localhost\reminst$/remote_path: \\$INT_IP\winpe/g' $HOME/maas/etc/maas/pserv.yaml
 }
 
 function disable_apparmor_for_dhcp {
