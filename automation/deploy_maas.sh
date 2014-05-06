@@ -362,15 +362,37 @@ EOD
 function get_cluster_uuid {
 	cd "$HOME/maas"
 	./bin/maas dev node-groups list | grep uuid | sed 's/.*: "//;s/".*//g'
-	cd -
+}
+
+function wait_for_uuid {
+	UUID=$(get_cluster_uuid)
+	count=0
+	while true
+	do
+		C=$(echo -n $UUID | wc -c)
+		if [ $C -eq 36 ]
+		then
+			echo $UUID
+			break
+		fi
+		count=$(($count + 1))
+		if [ $count -ge 20 ]
+		then
+			echo "FAILED to get cluster UUID"
+			exit 1
+		fi
+		sleep 10
+		UUID=$(get_cluster_uuid)
+	done
 }
 
 function set_private_interface {
-	UUID=$(get_cluster_uuid)
+	UUID=$(wait_for_uuid)
 	pushd "$HOME/maas"
 	START_IP=${INT_IP%.*}.100
 	STOP_IP=${INT_IP%.*}.200
-	./bin/maas dev node-group-interface update $UUID $INT_NIC router_ip=$INT_IP ip_range_low=$START_IP ip_range_high=$STOP_IP
+	echo ./bin/maas dev node-group-interface update $UUID $INT_NIC router_ip=$INT_IP ip_range_low=$START_IP ip_range_high=$STOP_IP management=2
+	./bin/maas dev node-group-interface update $UUID $INT_NIC router_ip=$INT_IP ip_range_low=$START_IP ip_range_high=$STOP_IP management=2
 	popd
 }
 
