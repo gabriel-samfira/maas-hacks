@@ -409,7 +409,7 @@ fix_tftp
 run_maas_in_background
 wait_for_maas
 create_superuser
-import_pxe_images
 do_maas_login
 set_private_interface
 set_upstream_dns
+import_pxe_images
