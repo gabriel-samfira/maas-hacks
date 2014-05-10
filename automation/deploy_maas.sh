@@ -208,8 +208,19 @@ function setup_samba {
   public = yes
   guest ok = yes
   browseable = yes
+  blocking locks = no
+  oplocks = no
+  level2 oplocks = no
+  locking = no
+  strict locking = no
 
 EOF
+
+sed -i '/\[global\]/ a\
+kernel oplocks = no \
+strict locking = no \
+' /etc/samba/smb.conf
+
 	sudo service smbd restart
 }
 
